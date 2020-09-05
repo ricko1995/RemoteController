@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="mainActivityModel"
+            type="com.ricko.remotecontroller.MainViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:onClick="hideKeyboard"
+        android:padding="16dp"
+        tools:context=".MainActivity">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout2"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:boxBackgroundColor="@android:color/darker_gray"
+            app:boxCornerRadiusBottomEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusTopStart="16dp"
+            app:helperText="Example: ws://192.168.1.9"
+            app:layout_constraintBottom_toTopOf="@+id/textInputLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:startIconDrawable="@drawable/ic_round_memory_24">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSocketAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="@{mainActivityModel.status != `STATUS_OPENED`}"
+                android:hint="Websocket address"
+                android:text="@={mainActivityModel.webSocketAddress}" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:boxBackgroundColor="@android:color/darker_gray"
+            app:boxCornerRadiusBottomEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusTopStart="16dp"
+            app:helperText="Example: 1234"
+            app:layout_constraintBottom_toTopOf="@+id/btnConnectToSocket"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2"
+            app:startIconDrawable="@drawable/ic_baseline_device_hub_24">
+
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSocketPort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="@{mainActivityModel.status != `STATUS_OPENED`}"
+                android:hint="Port"
+                android:inputType="number"
+                android:text="@={mainActivityModel.webSocketPort}" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConnectToSocket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:onClick="openCloseWebSocket"
+            android:text="@{mainActivityModel.openCloseSocketBtnTxt}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+
+        <View
+            android:id="@+id/viewConnectionIndicator"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/circle"
+            android:backgroundTint="@{mainActivityModel.statusColor}"
+            android:onClick="openCloseWebSocket"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="72dp" />
+
+        <TextView
+            android:id="@+id/txtPing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{mainActivityModel.ping.toString() + ` ms`}"
+            android:textSize="8sp"
+            android:visibility="@{mainActivityModel.status == `STATUS_OPENED` ? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toEndOf="@+id/viewConnectionIndicator"
+            app:layout_constraintStart_toStartOf="@+id/viewConnectionIndicator"
+            app:layout_constraintTop_toBottomOf="@+id/viewConnectionIndicator"
+            tools:text="TextView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

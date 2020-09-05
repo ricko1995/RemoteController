@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="mainActivityModel"
+            type="com.ricko.remotecontroller.MainViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+
+        <View
+            android:id="@+id/viewConnectionIndicator"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/circle"
+            android:backgroundTint="@{mainActivityModel.statusColor}"
+            android:clickable="true"
+            android:focusable="true"
+            android:onClick="openCloseWebSocket"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/viewTouchPad"
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:background="@color/gray"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            app:layout_constraintTop_toTopOf="@+id/viewTouchPad"
+            app:layout_constraintEnd_toEndOf="@+id/viewTouchPad"
+            android:background="@drawable/ic_baseline_settings_24"
+            android:onClick="openTouchPadSettingsDialog"/>
+
+        <View
+            android:id="@+id/viewTouchPadStick"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/circle"
+            android:backgroundTint="@android:color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/viewTouchPad"
+            app:layout_constraintStart_toStartOf="@+id/viewTouchPad"
+            app:layout_constraintTop_toTopOf="@+id/viewTouchPad" />
+
+        <View
+            android:id="@+id/touchPadVerticalLine"
+            android:layout_width="1px"
+            android:layout_height="match_parent"
+            android:background="@android:color/black"
+            app:layout_constraintEnd_toEndOf="@+id/viewTouchPadStick"
+            app:layout_constraintStart_toStartOf="@+id/viewTouchPadStick" />
+
+        <View
+            android:id="@+id/touchPadHorizontalLine"
+            android:layout_width="0dp"
+            android:layout_height="1px"
+            android:background="@android:color/black"
+            app:layout_constraintBottom_toBottomOf="@+id/viewTouchPadStick"
+            app:layout_constraintEnd_toEndOf="@+id/viewTouchPad"
+            app:layout_constraintStart_toStartOf="@+id/viewTouchPad"
+            app:layout_constraintTop_toTopOf="@+id/viewTouchPadStick" />
+
+        <TextView
+            android:id="@+id/txtPing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{mainActivityModel.ping.toString() + ` ms`}"
+            android:textSize="8sp"
+            android:visibility="@{mainActivityModel.status == `STATUS_OPENED` ? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toEndOf="@+id/viewConnectionIndicator"
+            app:layout_constraintStart_toStartOf="@+id/viewConnectionIndicator"
+            app:layout_constraintTop_toBottomOf="@+id/viewConnectionIndicator"
+            tools:text="TextView" />
+
+        <io.github.controlwear.virtual.joystick.android.JoystickView
+            android:id="@+id/viewJoystick"
+            app:JV_backgroundColor="@color/colorAccent"
+            android:layout_width="200dp"
+            android:background="@drawable/circle"
+            android:layout_height="200dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
