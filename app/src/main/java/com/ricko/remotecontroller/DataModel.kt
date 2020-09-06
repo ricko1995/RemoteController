@@ -3,8 +3,10 @@ package com.ricko.remotecontroller
 import java.util.*
 
 data class DataModel(
-    val touchPadStickX: Float = 0f,
-    val touchPadStickY: Float = 0f,
+    var id: String = UUID.randomUUID().toString(),
     var time: Long = 0L,
-    val id: String = UUID.randomUUID().toString()
+    val touchPadStickX: Int = 0,
+    val touchPadStickY: Int = 0,
+    val joystickX: Int = 0,
+    val joystickY: Int = 0
 )

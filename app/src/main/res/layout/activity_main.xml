@@ -87,12 +87,13 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:onClick="openCloseWebSocket"
-            android:text="@{mainActivityModel.openCloseSocketBtnTxt}"
+            android:text="@{mainActivityModel.status == `STATUS_OPENED` ? @string/close_websocket_connection : @string/connect_to_websocket}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+            tools:text="@string/connect_to_websocket" />
 
         <View
             android:id="@+id/viewConnectionIndicator"

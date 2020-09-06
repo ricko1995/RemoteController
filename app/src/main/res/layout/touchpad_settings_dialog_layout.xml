@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="mainViewModel"
+            type="com.ricko.remotecontroller.MainViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:onClick="hideKeyboard">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/textView0"
+            style="@style/TextAppearance.MaterialComponents.Headline6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TouchPad Settings" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginBottom="4dp"
+            android:background="@color/gray" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:onClick="hideKeyboard">
+
+                <SeekBar
+                    android:id="@+id/seekBarHorizontalSensitivity"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:progress="@={mainViewModel.touchPadHorizontalSensitivity}"
+                    app:layout_constraintEnd_toStartOf="@+id/switch1"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/textView"
+                    app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+                <SeekBar
+                    android:id="@+id/seekBarVerticalSensitivity"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:progress="@={mainViewModel.touchPadVerticalSensitivity}"
+                    app:layout_constraintEnd_toStartOf="@+id/switch1"
+                    app:layout_constraintStart_toEndOf="@+id/textView2"
+                    app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@{mainViewModel.touchPadHorizontalSensitivity.toString()}"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/seekBarHorizontalSensitivity"
+                    app:layout_constraintEnd_toStartOf="@+id/seekBarHorizontalSensitivity"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/seekBarHorizontalSensitivity"
+                    tools:text="50" />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@{mainViewModel.touchPadVerticalSensitivity.toString()}"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/seekBarVerticalSensitivity"
+                    app:layout_constraintEnd_toStartOf="@+id/seekBarVerticalSensitivity"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/seekBarVerticalSensitivity"
+                    tools:text="50" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="@={mainViewModel.toggleJointSensitivity}"
+                    app:layout_constraintBottom_toBottomOf="@+id/seekBarVerticalSensitivity"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/seekBarHorizontalSensitivity"
+                    app:layout_constraintTop_toTopOf="@+id/seekBarHorizontalSensitivity" />
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Horizontal Sensitivity"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="@+id/seekBarHorizontalSensitivity"
+                    app:layout_constraintStart_toStartOf="@+id/seekBarHorizontalSensitivity"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Vertical Sensitivity"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="@+id/seekBarVerticalSensitivity"
+                    app:layout_constraintStart_toStartOf="@+id/seekBarVerticalSensitivity"
+                    app:layout_constraintTop_toBottomOf="@+id/seekBarHorizontalSensitivity" />
+
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Automatically recenter TouchPad:"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@+id/toggleRecenter"
+                    app:layout_constraintEnd_toStartOf="@+id/toggleRecenter"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/toggleRecenter" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/toggleRecenter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="@={mainViewModel.toggleRecenterTouchPad}"
+                    android:text="Automatically recenter TouchPad: "
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/seekBarVerticalSensitivity" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayout4"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/textInputLayout3"
+                    app:layout_constraintStart_toEndOf="@+id/textView7"
+                    app:layout_constraintTop_toTopOf="@+id/textInputLayout3">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@={mainViewModel.mapTouchPadXFrom}"
+                        android:hint="From:"
+                        android:inputType="numberSigned"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayout3"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toEndOf="@+id/textInputLayout4"
+                    app:layout_constraintTop_toBottomOf="@+id/toggleRecenter">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@={mainViewModel.mapTouchPadXTo}"
+                        android:hint="To:"
+                        android:inputType="numberSigned"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/textView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Map X:"
+                    app:layout_constraintBottom_toBottomOf="@+id/textInputLayout4"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/textInputLayout4" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayout5"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/textInputLayout6"
+                    app:layout_constraintStart_toEndOf="@+id/textView6"
+                    app:layout_constraintTop_toTopOf="@+id/textInputLayout6">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@={mainViewModel.mapTouchPadYFrom}"
+                        android:hint="From:"
+                        android:inputType="numberSigned"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayout6"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toEndOf="@+id/textInputLayout5"
+                    app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@={mainViewModel.mapTouchPadYTo}"
+                        android:hint="To:"
+                        android:inputType="numberSigned"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Map Y:"
+                    app:layout_constraintBottom_toBottomOf="@+id/textInputLayout5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/textInputLayout5" />
+
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="16dp"
+                    android:background="@drawable/ic_outline_info_24"
+                    android:onClick="showMappingInfoBalloon"
+                    android:backgroundTint="@color/gray"
+                    app:layout_constraintBottom_toBottomOf="@+id/textInputLayout6"
+                    app:layout_constraintStart_toEndOf="@+id/textInputLayout3"
+                    app:layout_constraintTop_toTopOf="@+id/textInputLayout3" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</layout>

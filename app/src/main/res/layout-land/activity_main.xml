@@ -40,10 +40,10 @@
         <View
             android:layout_width="32dp"
             android:layout_height="32dp"
-            app:layout_constraintTop_toTopOf="@+id/viewTouchPad"
-            app:layout_constraintEnd_toEndOf="@+id/viewTouchPad"
             android:background="@drawable/ic_baseline_settings_24"
-            android:onClick="openTouchPadSettingsDialog"/>
+            android:onClick="openTouchPadSettingsDialog"
+            app:layout_constraintEnd_toEndOf="@+id/viewTouchPad"
+            app:layout_constraintTop_toTopOf="@+id/viewTouchPad" />
 
         <View
             android:id="@+id/viewTouchPadStick"
@@ -89,12 +89,22 @@
 
         <io.github.controlwear.virtual.joystick.android.JoystickView
             android:id="@+id/viewJoystick"
-            app:JV_backgroundColor="@color/colorAccent"
-            android:layout_width="200dp"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
             android:background="@drawable/circle"
-            android:layout_height="200dp"
+            app:JV_backgroundColor="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="40dp"/>
+        <View
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/ic_baseline_settings_24"
+            android:backgroundTint="@android:color/darker_gray"
+            android:onClick="openJoystickSettingsDialog"
+            app:layout_constraintEnd_toEndOf="@+id/viewJoystick"
+            app:layout_constraintTop_toTopOf="@+id/viewJoystick"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

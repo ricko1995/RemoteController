@@ -14,15 +14,17 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
+import com.ricko.remotecontroller.HelperClass.mapValues
 import com.ricko.remotecontroller.HelperClass.retrieveAddressFromSharedPref
 import com.ricko.remotecontroller.HelperClass.retrievePortFromSharedPref
 import com.ricko.remotecontroller.HelperClass.saveAddressPortToSharedPref
 import com.ricko.remotecontroller.HelperClass.sharedPref
-import com.ricko.remotecontroller.MainViewModel.Companion.STATUS_CLOSING
-import com.ricko.remotecontroller.MainViewModel.Companion.STATUS_FAILURE
 import com.ricko.remotecontroller.MainViewModel.Companion.STATUS_OPENED
 import com.ricko.remotecontroller.databinding.ActivityMainBinding
-import com.ricko.remotecontroller.databinding.DialogLayoutBinding
+import com.ricko.remotecontroller.databinding.JoystickSettingsDialogLayoutBinding
+import com.ricko.remotecontroller.databinding.TouchpadSettingsDialogLayoutBinding
+import com.skydoves.balloon.BalloonAnimation
+import com.skydoves.balloon.createBalloon
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -55,12 +57,19 @@ class MainActivity : AppCompatActivity() {
         viewModel.webSocketAddress.value = retrieveAddressFromSharedPref()
         viewModel.webSocketPort.value = retrievePortFromSharedPref()
         initTouchPad()
+        initJoystick()
     }
 
     private fun initInterface() {
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             supportActionBar?.hide()
             window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }
+    }
+
+    private fun initJoystick() {
+        viewJoystick?.setOnMoveListener { _, _ ->
+            postDataValuesToViewModel()
         }
     }
 
@@ -91,7 +100,7 @@ class MainActivity : AppCompatActivity() {
                 postDataValuesToViewModel()
             }
             if (motionEvent.action == MotionEvent.ACTION_UP) {
-                if (viewModel.toggleRecenterSwitch.value!!) {
+                if (viewModel.toggleRecenterTouchPad.value!!) {
                     recenterTouchPadStick()
                 }
             }
@@ -103,7 +112,21 @@ class MainActivity : AppCompatActivity() {
     @Suppress("unused")
     fun View.openTouchPadSettingsDialog() {
         val dialog = Dialog(context)
-        val dialogBinding = DialogLayoutBinding.inflate(LayoutInflater.from(context));
+        val dialogBinding =
+            TouchpadSettingsDialogLayoutBinding.inflate(LayoutInflater.from(context))
+        dialogBinding.apply {
+            mainViewModel = viewModel
+            lifecycleOwner = this@MainActivity
+        }
+        dialog.setContentView(dialogBinding.root)
+        dialog.show()
+    }
+
+    @Suppress("unused")
+    fun View.openJoystickSettingsDialog() {
+        val dialog = Dialog(context)
+        val dialogBinding =
+            JoystickSettingsDialogLayoutBinding.inflate(LayoutInflater.from(context))
         dialogBinding.apply {
             mainViewModel = viewModel
             lifecycleOwner = this@MainActivity
@@ -118,7 +141,7 @@ class MainActivity : AppCompatActivity() {
         previousStickX: Float,
         previousStickY: Float,
         currentStickX: Float,
-        currentStickY: Float
+        currentStickY: Float,
     ) {
         if (resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) return
         viewTouchPadStick!!.x =
@@ -150,7 +173,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun recenterTouchPadStick() {
         if (resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) return
-        viewModel.toggleRecenterSwitch.value?.let {
+        viewModel.toggleRecenterTouchPad.value?.let {
             if (it) {
                 viewTouchPadStick!!.x =
                     viewTouchPad!!.x + viewTouchPad!!.width / 2 - viewTouchPadStick!!.width / 2
@@ -164,13 +187,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun setObservers() {
 
+        viewModel.toggleRecenterJoystick.observe(this, {
+            viewJoystick?.isAutoReCenterButton = it
+        })
+
         viewModel.touchPadVerticalSensitivity.observe(this, {
-            if(viewModel.toggleJointSensitivity.value!!){
+            if (viewModel.toggleJointSensitivity.value!!) {
                 viewModel.touchPadHorizontalSensitivity.postValue(it)
             }
         })
         viewModel.touchPadHorizontalSensitivity.observe(this, {
-            if(viewModel.toggleJointSensitivity.value!!){
+            if (viewModel.toggleJointSensitivity.value!!) {
                 viewModel.touchPadVerticalSensitivity.postValue(it)
             }
         })
@@ -182,7 +209,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.toggleRecenterSwitch.observe(this, {
+        viewModel.toggleRecenterTouchPad.observe(this, {
             if (it) {
                 recenterTouchPadStick()
             }
@@ -232,12 +259,59 @@ class MainActivity : AppCompatActivity() {
 
     private fun postDataValuesToViewModel() {
         if (resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) return
-        val touchPadStickX = viewTouchPadStick!!.x + viewTouchPadStick!!.width / 2
-        val touchPadStickY = viewTouchPadStick!!.y + viewTouchPadStick!!.height / 2
+        val touchPadStickX = (viewTouchPadStick!!.x + viewTouchPadStick!!.width / 2).toInt()
+        val touchPadStickY = (viewTouchPadStick!!.y + viewTouchPadStick!!.height / 2).toInt()
+        val joystickX = viewJoystick!!.normalizedX
+        val joystickY = viewJoystick!!.normalizedY
 
+        val mappedTouchPadStickX = mapValues(0,
+            viewTouchPad!!.width,
+            viewModel.mapTouchPadXFrom.value!!.toInt(),
+            viewModel.mapTouchPadXTo.value!!.toInt(),
+            touchPadStickX)
+        val mappedTouchPadStickY = mapValues(0,
+            viewTouchPad!!.height,
+            viewModel.mapTouchPadYFrom.value!!.toInt(),
+            viewModel.mapTouchPadYTo.value!!.toInt(),
+            touchPadStickY)
 
-        val currentData = DataModel(touchPadStickX, touchPadStickY, System.currentTimeMillis())
+        val mappedJoystickX = mapValues(0,
+            100,
+            viewModel.mapJoystickXFrom.value!!.toInt(),
+            viewModel.mapJoystickXTo.value!!.toInt(),
+            joystickX)
+        val mappedJoystickY = mapValues(0,
+            100,
+            viewModel.mapJoystickYFrom.value!!.toInt(),
+            viewModel.mapJoystickYTo.value!!.toInt(),
+            joystickY)
+
+        val currentData = DataModel(
+            touchPadStickX = mappedTouchPadStickX,
+            touchPadStickY = mappedTouchPadStickY,
+            joystickX = mappedJoystickX,
+            joystickY = mappedJoystickY
+        )
         viewModel.currentData.postValue(currentData)
+    }
+
+    fun View.showMappingInfoBalloon(){
+        val balloon = createBalloon(context) {
+            setWidthRatio(.2f)
+            setHeight(80)
+            setCornerRadius(4f)
+            setAlpha(0.9f)
+            arrowVisible = false
+            setPadding(8)
+            setText("Usually from 0 to 180 for servo motors or ESCs.")
+            setTextColorResource(R.color.design_default_color_on_primary)
+            setTextIsHtml(true)
+            setBackgroundColorResource(R.color.gray)
+            setBalloonAnimation(BalloonAnimation.FADE)
+            setLifecycleOwner(lifecycleOwner)
+        }
+
+        balloon.show(this)
     }
 
 

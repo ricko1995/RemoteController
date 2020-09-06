@@ -15,7 +15,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.*
+import java.util.*
 import kotlin.Exception
+import kotlin.collections.ArrayList
 
 class MainViewModel : ViewModel(), Observable {
 
@@ -26,6 +28,8 @@ class MainViewModel : ViewModel(), Observable {
         const val STATUS_CLOSING = "STATUS_CLOSING"
 
         const val DELAY_BETWEEN_MESSAGES = 30L
+
+        const val TIME_DIFFERENCE = 1599387900000
     }
 
     private var webSocket: WebSocket? = null
@@ -52,11 +56,10 @@ class MainViewModel : ViewModel(), Observable {
     val statusColor: MutableLiveData<Int> = MutableLiveData(Color.GRAY)
 
     @Bindable
-    val toggleRecenterSwitch: MutableLiveData<Boolean> = MutableLiveData(false)
+    val toggleRecenterTouchPad: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    private val _openCloseSocketBtnTxt: MutableLiveData<String> =
-        MutableLiveData("Connect to websocket")
-    val openCloseSocketBtnTxt: LiveData<String> = _openCloseSocketBtnTxt
+    @Bindable
+    val toggleRecenterJoystick: MutableLiveData<Boolean> = MutableLiveData(true)
 
     @Bindable
     val touchPadHorizontalSensitivity: MutableLiveData<Int> = MutableLiveData(50)
@@ -66,6 +69,30 @@ class MainViewModel : ViewModel(), Observable {
 
     @Bindable
     val toggleJointSensitivity: MutableLiveData<Boolean> = MutableLiveData(true)
+
+    @Bindable
+    val mapTouchPadXFrom: MutableLiveData<String> = MutableLiveData("0")
+
+    @Bindable
+    val mapTouchPadXTo: MutableLiveData<String> = MutableLiveData("180")
+
+    @Bindable
+    val mapTouchPadYFrom: MutableLiveData<String> = MutableLiveData("0")
+
+    @Bindable
+    val mapTouchPadYTo: MutableLiveData<String> = MutableLiveData("180")
+
+    @Bindable
+    val mapJoystickXFrom: MutableLiveData<String> = MutableLiveData("0")
+
+    @Bindable
+    val mapJoystickXTo: MutableLiveData<String> = MutableLiveData("180")
+
+    @Bindable
+    val mapJoystickYFrom: MutableLiveData<String> = MutableLiveData("0")
+
+    @Bindable
+    val mapJoystickYTo: MutableLiveData<String> = MutableLiveData("180")
 
 
     private var myToast: Toast? = null
@@ -83,34 +110,32 @@ class MainViewModel : ViewModel(), Observable {
                     initiateDataTransfer()
                     showToast("Successful connection")
                     statusColor.value = Color.GREEN
-                    _openCloseSocketBtnTxt.postValue("Close websocket connection")
                 }
                 STATUS_CLOSED -> {
                     showToast("Connection closed")
                     statusColor.value = Color.GRAY
                     _ping.postValue(0)
-                    _openCloseSocketBtnTxt.postValue("Connect to websocket")
+                    sentMessages.clear()
 //                    stopDataTransfer()
 //                    closeSocketConnection("User closed connection")
                 }
                 STATUS_FAILURE -> {
 //                    showToast("Failed to connect")
                     statusColor.value = Color.RED
-                    _openCloseSocketBtnTxt.postValue("Connect to websocket")
+                    sentMessages.clear()
 //                    stopDataTransfer()
 //                    closeSocketConnection("Something went wrong")
                 }
                 STATUS_CLOSING -> {
                     statusColor.value = Color.YELLOW
+                    sentMessages.clear()
                     showToast("Closing connection")
-                    _openCloseSocketBtnTxt.postValue("Close websocket connection")
                 }
             }
         }
 
         try {
             val url = "${webSocketAddress.value}:${webSocketPort.value}"
-            println(url)
             val request = Request.Builder().url(url).build()
             webSocket = OkHttpClient().newWebSocket(request, object : WebSocketListener() {
 
@@ -145,6 +170,7 @@ class MainViewModel : ViewModel(), Observable {
         dataTransferJob?.cancel()
         dataTransferJob = null
         currentData.postValue(DataModel())
+        sentMessages.clear()
     }
 
     private fun initiateDataTransfer() {
@@ -159,7 +185,8 @@ class MainViewModel : ViewModel(), Observable {
             delay(DELAY_BETWEEN_MESSAGES)
             try {
                 currentData.value?.apply {
-                    time = System.currentTimeMillis()
+                    time = System.currentTimeMillis() - TIME_DIFFERENCE
+                    id = UUID.randomUUID().toString()
                     sentMessages.add(this)
                     webSocket?.send(Gson().toJson(this))
                 }
@@ -185,9 +212,8 @@ class MainViewModel : ViewModel(), Observable {
         id?.let { msgId ->
             time?.let { time ->
                 val a = sentMessages.filter { it.id == msgId }
-                println(a.size)
                 if (a.isNotEmpty()) {
-                    val pingLoc = System.currentTimeMillis() - time
+                    val pingLoc = (System.currentTimeMillis() - time) - TIME_DIFFERENCE
                     _ping.postValue(pingLoc)
                     sentMessages.removeAll(a)
                 }
