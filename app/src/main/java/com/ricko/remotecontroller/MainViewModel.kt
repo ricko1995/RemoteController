@@ -195,7 +195,7 @@ class MainViewModel : ViewModel(), Observable {
     }
 
     private fun extractDataFromMessage(msg: String) {
-        var msgObject: DataModel? = null
+        val msgObject: DataModel?
         try {
             msgObject = Gson().fromJson(msg, DataModel::class.java)
             calculatePing(msgObject?.id, msgObject?.time)
