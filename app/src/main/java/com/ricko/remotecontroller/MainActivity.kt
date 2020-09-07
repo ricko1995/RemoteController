@@ -1,10 +1,8 @@
 package com.ricko.remotecontroller
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.res.Configuration
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -13,6 +11,7 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.ricko.remotecontroller.HelperClass.mapValues
 import com.ricko.remotecontroller.HelperClass.retrieveAddressFromSharedPref
@@ -32,9 +31,6 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
 
-    companion object {
-        lateinit var activity: Activity
-    }
 
     override fun onBackPressed() {
         super.onBackPressed()
@@ -49,7 +45,6 @@ class MainActivity : AppCompatActivity() {
             lifecycleOwner = this@MainActivity
         }
         initInterface()
-        activity = this
 
         sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
 
@@ -216,10 +211,13 @@ class MainActivity : AppCompatActivity() {
         })
 
         viewModel.status.observe(this, {
-            if (it == STATUS_OPENED) saveAddressPortToSharedPref(
-                viewModel.webSocketAddress.value,
-                viewModel.webSocketPort.value
-            )
+            if (it == STATUS_OPENED) {
+                saveAddressPortToSharedPref(
+                    viewModel.webSocketAddress.value,
+                    viewModel.webSocketPort.value
+                )
+                Toast.makeText(this, "Successful connection", Toast.LENGTH_SHORT).show()
+            }
         })
 
         viewModel.connectSocketError.observe(this, {

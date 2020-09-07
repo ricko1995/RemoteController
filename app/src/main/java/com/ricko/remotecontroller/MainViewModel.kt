@@ -1,14 +1,12 @@
 package com.ricko.remotecontroller
 
 import android.graphics.Color
-import android.widget.Toast
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
-import com.ricko.remotecontroller.MainActivity.Companion.activity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Job
@@ -16,7 +14,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.*
 import java.util.*
-import kotlin.Exception
 import kotlin.collections.ArrayList
 
 class MainViewModel : ViewModel(), Observable {
@@ -95,44 +92,42 @@ class MainViewModel : ViewModel(), Observable {
     val mapJoystickYTo: MutableLiveData<String> = MutableLiveData("180")
 
 
-    private var myToast: Toast? = null
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isLoading: MutableLiveData<Boolean> = _isLoading
 
-    private fun showToast(msg: String) {
-        myToast?.cancel()
-        myToast = Toast.makeText(activity, msg, Toast.LENGTH_SHORT)
-        myToast?.show()
-    }
-
-    fun initWebSocket() {
+    private val initStatusObserver by lazy {
         _status.observeForever {
             when (it) {
                 STATUS_OPENED -> {
                     initiateDataTransfer()
-                    showToast("Successful connection")
                     statusColor.value = Color.GREEN
+                    _isLoading.postValue(false)
                 }
                 STATUS_CLOSED -> {
-                    showToast("Connection closed")
                     statusColor.value = Color.GRAY
                     _ping.postValue(0)
                     sentMessages.clear()
-//                    stopDataTransfer()
-//                    closeSocketConnection("User closed connection")
+                    _isLoading.postValue(false)
                 }
                 STATUS_FAILURE -> {
-//                    showToast("Failed to connect")
                     statusColor.value = Color.RED
                     sentMessages.clear()
-//                    stopDataTransfer()
-//                    closeSocketConnection("Something went wrong")
+                    _isLoading.postValue(false)
                 }
                 STATUS_CLOSING -> {
                     statusColor.value = Color.YELLOW
                     sentMessages.clear()
-                    showToast("Closing connection")
+                    _isLoading.postValue(false)
                 }
             }
         }
+    }
+
+    fun initWebSocket() {
+        if (_isLoading.value!!) return
+        if (_status.value != STATUS_CLOSED || _status.value != null) _status.value = STATUS_CLOSED
+        initStatusObserver
+        _isLoading.postValue(true)
 
         try {
             val url = "${webSocketAddress.value}:${webSocketPort.value}"
@@ -152,7 +147,7 @@ class MainViewModel : ViewModel(), Observable {
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                     super.onFailure(webSocket, t, response)
                     _status.postValue(STATUS_FAILURE)
-                    connectSocketError.postValue("${response?.message} failure error")
+                    connectSocketError.postValue(t.message)
                 }
 
                 override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -166,11 +161,14 @@ class MainViewModel : ViewModel(), Observable {
     }
 
     fun stopDataTransfer() {
-        closeSocketConnection("User closed connection")
+        isLoading.value = true
+        _status.postValue(STATUS_CLOSING)
+        webSocket?.close(1000, "User closed connection")
         dataTransferJob?.cancel()
         dataTransferJob = null
         currentData.postValue(DataModel())
         sentMessages.clear()
+        isLoading.value = false
     }
 
     private fun initiateDataTransfer() {
@@ -200,11 +198,10 @@ class MainViewModel : ViewModel(), Observable {
         var msgObject: DataModel? = null
         try {
             msgObject = Gson().fromJson(msg, DataModel::class.java)
-        } catch (e: Exception) {
-            connectSocketError.postValue("${e.message} Gson error")
-        } finally {
             calculatePing(msgObject?.id, msgObject?.time)
             updateInterfaceWithNewData(msgObject)
+        } catch (e: Exception) {
+            connectSocketError.postValue("${e.message}\nGson error")
         }
     }
 
@@ -228,10 +225,6 @@ class MainViewModel : ViewModel(), Observable {
         }
     }
 
-    private fun closeSocketConnection(msg: String) {
-        _status.postValue(STATUS_CLOSING)
-        webSocket?.close(1000, msg)
-    }
 
     override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback?) {}
 

@@ -106,6 +106,16 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="72dp" />
 
+        <ProgressBar
+            android:layout_width="24dp"
+            android:layout_margin="4dp"
+            android:layout_height="24dp"
+            app:layout_constraintEnd_toStartOf="@+id/viewConnectionIndicator"
+            app:layout_constraintTop_toTopOf="@+id/viewConnectionIndicator"
+            app:layout_constraintBottom_toBottomOf="@+id/viewConnectionIndicator"
+            android:id="@+id/loadingProgressIndicator"
+            android:visibility="@{mainActivityModel.isLoading() ? View.VISIBLE : View.GONE}" />
+
         <TextView
             android:id="@+id/txtPing"
             android:layout_width="wrap_content"

@@ -28,6 +28,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <ProgressBar
+            android:id="@+id/loadingProgressIndicator"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_margin="4dp"
+            android:visibility="@{mainActivityModel.isLoading() ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="@+id/viewConnectionIndicator"
+            app:layout_constraintEnd_toStartOf="@+id/viewConnectionIndicator"
+            app:layout_constraintTop_toTopOf="@+id/viewConnectionIndicator" />
+
         <View
             android:id="@+id/viewTouchPad"
             android:layout_width="300dp"
@@ -91,12 +101,13 @@
             android:id="@+id/viewJoystick"
             android:layout_width="220dp"
             android:layout_height="220dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="40dp"
             android:background="@drawable/circle"
             app:JV_backgroundColor="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="40dp"/>
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <View
             android:layout_width="32dp"
             android:layout_height="32dp"
@@ -104,7 +115,7 @@
             android:backgroundTint="@android:color/darker_gray"
             android:onClick="openJoystickSettingsDialog"
             app:layout_constraintEnd_toEndOf="@+id/viewJoystick"
-            app:layout_constraintTop_toTopOf="@+id/viewJoystick"/>
+            app:layout_constraintTop_toTopOf="@+id/viewJoystick" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
